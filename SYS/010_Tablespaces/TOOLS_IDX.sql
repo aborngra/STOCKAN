@@ -28,8 +28,7 @@ BEGIN
               EXTENT MANAGEMENT LOCAL AUTOALLOCATE
               BLOCKSIZE 8K
               SEGMENT SPACE MANAGEMENT AUTO
-              FLASHBACK ON
-         ';
+              FLASHBACK ON';
 
       DBMS_OUTPUT.put_line(v_sql);
 
