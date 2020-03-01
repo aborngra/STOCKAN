@@ -1,6 +1,6 @@
 DECLARE
-   v_path            VARCHAR2(256 CHAR) := 'E:\APP\ABO\ORADATA\ORCL\';
-   v_tablespace_name VARCHAR2(256 CHAR) := 'TOOLS_DATA';
+   v_path            VARCHAR2(256 CHAR) := 'C:\Oracle\ORADATA\';
+   v_tablespace_name VARCHAR2(256 CHAR) := 'TS_TOOLS';
    v_size            VARCHAR2(256 CHAR) := '512M';
    v_size_next       VARCHAR2(256 CHAR) := '256M';
    v_sql             VARCHAR2(32667 CHAR);
