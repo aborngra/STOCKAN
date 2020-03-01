@@ -36,16 +36,16 @@ IS
   c_generator_version           CONSTANT VARCHAR2(10 CHAR) := '0.5.0_b3';
   c_ora_max_name_len            CONSTANT INTEGER :=  $IF dbms_db_version.ver_le_11_1 $THEN
                                                     30  $ELSE
-                                              $IF dbms_db_version.ver_le_11_2 $THEN
-                                               30
-                                              $ELSE
-                                              $IF dbms_db_version.ver_le_12_1 $THEN
-                                               30
-                                              $ELSE
-                                               ora_max_name_len
-       $END
-       $END
-       $END
+                                             $IF dbms_db_version.ver_le_11_2 $THEN
+                                              30
+                                             $ELSE
+                                             $IF dbms_db_version.ver_le_12_1 $THEN
+                                              30
+                                             $ELSE
+                                              ora_max_name_len
+      $END
+      $END
+      $END
                                                       ;
 
   -- parameter defaults

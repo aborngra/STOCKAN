@@ -378,16 +378,16 @@ IS
                                     , VALUE            => p_emit_schema_yn);
   END lp_config_dbms_metadata;
 
-  FUNCTION lp_get_template(p_object IN maint_waas.meta_code_template.object%TYPE)
+  FUNCTION lp_get_template(p_object IN tools.meta_code_template.object%TYPE)
     RETURN CLOB
   IS
-    CURSOR v_template(p_object IN maint_waas.meta_code_template.object%TYPE)
+    CURSOR v_template(p_object IN tools.meta_code_template.object%TYPE)
     IS
       SELECT script_template
-        FROM maint_waas.meta_code_template
+        FROM tools.meta_code_template
        WHERE object = p_object;
 
-    v_template_clob maint_waas.meta_code_template.script_template%TYPE;
+    v_template_clob tools.meta_code_template.script_template%TYPE;
   BEGIN
     ----------------------------------------------------------------------------
     -- check the param
@@ -395,7 +395,7 @@ IS
     IF (p_object IS NOT NULL)
     THEN
       --------------------------------------------------------------------------
-      -- get the template from maint_waas.meta_code_template
+      -- get the template from tools.meta_code_template
       --------------------------------------------------------------------------
       OPEN v_template(p_object => p_object);
 
@@ -407,11 +407,11 @@ IS
     RETURN v_template_clob;
   END lp_get_template;
 
-  FUNCTION lp_prepare_filename(p_object IN maint_waas.meta_code_versioning.object%TYPE
-                             , p_name   IN maint_waas.meta_code_versioning.name%TYPE)
-    RETURN maint_waas.meta_code_versioning.filename%TYPE
+  FUNCTION lp_prepare_filename(p_object IN tools.meta_code_versioning.object%TYPE
+                             , p_name   IN tools.meta_code_versioning.name%TYPE)
+    RETURN tools.meta_code_versioning.filename%TYPE
   IS
-    v_filename maint_waas.meta_code_versioning.filename%TYPE;
+    v_filename tools.meta_code_versioning.filename%TYPE;
   BEGIN
     v_filename := REPLACE(g_files(p_object), '###NAME###', p_name);
     v_filename := REPLACE(v_filename, '###OWNER###', g_user);
@@ -419,13 +419,13 @@ IS
     RETURN v_filename;
   END lp_prepare_filename;
 
-  PROCEDURE lp_delete_scripts_of_type(p_object IN maint_waas.meta_code_versioning.object%TYPE)
+  PROCEDURE lp_delete_scripts_of_type(p_object IN tools.meta_code_versioning.object%TYPE)
   IS
   BEGIN
     ----------------------------------------------------------------------------
     -- delete existing scripts from user
     ----------------------------------------------------------------------------
-    DELETE FROM maint_waas.meta_code_versioning
+    DELETE FROM tools.meta_code_versioning
           WHERE schema = g_user
             AND object = p_object;
 
@@ -497,15 +497,13 @@ IS
       -- bulk insert all scripts from collection
       --------------------------------------------------------------------------
       FORALL i IN INDICES OF g_tab_sequences
-        INSERT INTO maint_waas.meta_code_versioning(id
-                                                  , schema
-                                                  , object
-                                                  , name
-                                                  , filename
-                                                  , script
-                                                  , created_at)
-             VALUES (maint_waas.meta_code_versioning_seq.NEXTVAL
-                   , g_user
+        INSERT INTO tools.meta_code_versioning(schema
+                                             , object
+                                             , name
+                                             , filename
+                                             , script
+                                             , created_at)
+             VALUES (g_user
                    , 'SEQUENCE'
                    , g_tab_sequences(i).sequence_name
                    , g_tab_sequences(i).filename
@@ -643,15 +641,13 @@ IS
       -- bulk insert all scripts from collection
       --------------------------------------------------------------------------
       FORALL i IN INDICES OF g_tab_tables
-        INSERT INTO maint_waas.meta_code_versioning(id
-                                                  , schema
-                                                  , object
-                                                  , name
-                                                  , filename
-                                                  , script
-                                                  , created_at)
-             VALUES (maint_waas.meta_code_versioning_seq.NEXTVAL
-                   , g_user
+        INSERT INTO tools.meta_code_versioning(schema
+                                             , object
+                                             , name
+                                             , filename
+                                             , script
+                                             , created_at)
+             VALUES (g_user
                    , 'TABLE'
                    , g_tab_tables(i).table_name
                    , g_tab_tables(i).filename
@@ -755,15 +751,13 @@ IS
       -- bulk insert all scripts from collection
       --------------------------------------------------------------------------
       FORALL i IN INDICES OF g_tab_fk_constraints
-        INSERT INTO maint_waas.meta_code_versioning(id
-                                                  , schema
-                                                  , object
-                                                  , name
-                                                  , filename
-                                                  , script
-                                                  , created_at)
-             VALUES (maint_waas.meta_code_versioning_seq.NEXTVAL
-                   , g_user
+        INSERT INTO tools.meta_code_versioning(schema
+                                             , object
+                                             , name
+                                             , filename
+                                             , script
+                                             , created_at)
+             VALUES (g_user
                    , 'FK_CONSTRAINT'
                    , g_tab_fk_constraints(i).table_name || '_FKs'
                    , g_tab_fk_constraints(i).filename
@@ -844,15 +838,13 @@ IS
       -- bulk insert all scripts from collection
       --------------------------------------------------------------------------
       FORALL i IN INDICES OF g_tab_indexes
-        INSERT INTO maint_waas.meta_code_versioning(id
-                                                  , schema
-                                                  , object
-                                                  , name
-                                                  , filename
-                                                  , script
-                                                  , created_at)
-             VALUES (maint_waas.meta_code_versioning_seq.NEXTVAL
-                   , g_user
+        INSERT INTO tools.meta_code_versioning(schema
+                                             , object
+                                             , name
+                                             , filename
+                                             , script
+                                             , created_at)
+             VALUES (g_user
                    , 'INDEX'
                    , g_tab_indexes(i).index_name
                    , g_tab_indexes(i).filename
@@ -913,15 +905,13 @@ IS
       -- bulk insert all scripts from collection
       --------------------------------------------------------------------------
       FORALL i IN INDICES OF g_tab_packages_api
-        INSERT INTO maint_waas.meta_code_versioning(id
-                                                  , schema
-                                                  , object
-                                                  , name
-                                                  , filename
-                                                  , script
-                                                  , created_at)
-             VALUES (maint_waas.meta_code_versioning_seq.NEXTVAL
-                   , g_user
+        INSERT INTO tools.meta_code_versioning(schema
+                                             , object
+                                             , name
+                                             , filename
+                                             , script
+                                             , created_at)
+             VALUES (g_user
                    , 'PACKAGE_API'
                    , g_tab_packages_api(i).object_name
                    , g_tab_packages_api(i).filename
@@ -964,15 +954,13 @@ IS
       -- bulk insert all scripts from collection
       --------------------------------------------------------------------------
       FORALL i IN INDICES OF g_tab_packages_api_bodies
-        INSERT INTO maint_waas.meta_code_versioning(id
-                                                  , schema
-                                                  , object
-                                                  , name
-                                                  , filename
-                                                  , script
-                                                  , created_at)
-             VALUES (maint_waas.meta_code_versioning_seq.NEXTVAL
-                   , g_user
+        INSERT INTO tools.meta_code_versioning(schema
+                                             , object
+                                             , name
+                                             , filename
+                                             , script
+                                             , created_at)
+             VALUES (g_user
                    , 'PACKAGE_BODY_API'
                    , g_tab_packages_api_bodies(i).object_name
                    , g_tab_packages_api_bodies(i).filename
@@ -1037,15 +1025,13 @@ IS
       -- bulk insert all scripts from collection
       --------------------------------------------------------------------------
       FORALL i IN INDICES OF g_tab_packages_bl
-        INSERT INTO maint_waas.meta_code_versioning(id
-                                                  , schema
-                                                  , object
-                                                  , name
-                                                  , filename
-                                                  , script
-                                                  , created_at)
-             VALUES (maint_waas.meta_code_versioning_seq.NEXTVAL
-                   , g_user
+        INSERT INTO tools.meta_code_versioning(schema
+                                             , object
+                                             , name
+                                             , filename
+                                             , script
+                                             , created_at)
+             VALUES (g_user
                    , 'PACKAGE'
                    , g_tab_packages_bl(i).object_name
                    , g_tab_packages_bl(i).filename
@@ -1088,15 +1074,13 @@ IS
       -- bulk insert all scripts from collection
       --------------------------------------------------------------------------
       FORALL i IN INDICES OF g_tab_packages_bl_bodies
-        INSERT INTO maint_waas.meta_code_versioning(id
-                                                  , schema
-                                                  , object
-                                                  , name
-                                                  , filename
-                                                  , script
-                                                  , created_at)
-             VALUES (maint_waas.meta_code_versioning_seq.NEXTVAL
-                   , g_user
+        INSERT INTO tools.meta_code_versioning(schema
+                                             , object
+                                             , name
+                                             , filename
+                                             , script
+                                             , created_at)
+             VALUES (g_user
                    , 'PACKAGE_BODY'
                    , g_tab_packages_bl_bodies(i).object_name
                    , g_tab_packages_bl_bodies(i).filename
@@ -1156,15 +1140,13 @@ IS
       -- bulk insert all scripts from collection
       --------------------------------------------------------------------------
       FORALL i IN INDICES OF g_tab_synonyms
-        INSERT INTO maint_waas.meta_code_versioning(id
-                                                  , schema
-                                                  , object
-                                                  , name
-                                                  , filename
-                                                  , script
-                                                  , created_at)
-             VALUES (maint_waas.meta_code_versioning_seq.NEXTVAL
-                   , g_user
+        INSERT INTO tools.meta_code_versioning(schema
+                                             , object
+                                             , name
+                                             , filename
+                                             , script
+                                             , created_at)
+             VALUES (g_user
                    , 'SYNONYM'
                    , g_tab_synonyms(i).synonym_name
                    , g_tab_synonyms(i).filename
@@ -1223,15 +1205,13 @@ IS
       -- bulk insert all scripts from collection
       --------------------------------------------------------------------------
       FORALL i IN INDICES OF g_tab_triggers
-        INSERT INTO maint_waas.meta_code_versioning(id
-                                                  , schema
-                                                  , object
-                                                  , name
-                                                  , filename
-                                                  , script
-                                                  , created_at)
-             VALUES (maint_waas.meta_code_versioning_seq.NEXTVAL
-                   , g_user
+        INSERT INTO tools.meta_code_versioning(schema
+                                             , object
+                                             , name
+                                             , filename
+                                             , script
+                                             , created_at)
+             VALUES (g_user
                    , 'TRIGGER'
                    , g_tab_triggers(i).trigger_name
                    , g_tab_triggers(i).filename
@@ -1311,15 +1291,13 @@ IS
       -- bulk insert all scripts from collection
       --------------------------------------------------------------------------
       FORALL i IN INDICES OF g_tab_types
-        INSERT INTO maint_waas.meta_code_versioning(id
-                                                  , schema
-                                                  , object
-                                                  , name
-                                                  , filename
-                                                  , script
-                                                  , created_at)
-             VALUES (maint_waas.meta_code_versioning_seq.NEXTVAL
-                   , g_user
+        INSERT INTO tools.meta_code_versioning(schema
+                                             , object
+                                             , name
+                                             , filename
+                                             , script
+                                             , created_at)
+             VALUES (g_user
                    , 'TYPE'
                    , g_tab_types(i).type_name
                    , g_tab_types(i).filename
@@ -1368,15 +1346,13 @@ IS
       -- bulk insert all scripts from collection
       --------------------------------------------------------------------------
       FORALL i IN INDICES OF g_tab_type_bodies
-        INSERT INTO maint_waas.meta_code_versioning(id
-                                                  , schema
-                                                  , object
-                                                  , name
-                                                  , filename
-                                                  , script
-                                                  , created_at)
-             VALUES (maint_waas.meta_code_versioning_seq.NEXTVAL
-                   , g_user
+        INSERT INTO tools.meta_code_versioning(schema
+                                             , object
+                                             , name
+                                             , filename
+                                             , script
+                                             , created_at)
+             VALUES (g_user
                    , 'TYPE_BODY'
                    , g_tab_type_bodies(i).type_name
                    , g_tab_type_bodies(i).filename
@@ -1432,15 +1408,13 @@ IS
       -- bulk insert all scripts from collection
       --------------------------------------------------------------------------
       FORALL i IN INDICES OF g_tab_views
-        INSERT INTO maint_waas.meta_code_versioning(id
-                                                  , schema
-                                                  , object
-                                                  , name
-                                                  , filename
-                                                  , script
-                                                  , created_at)
-             VALUES (maint_waas.meta_code_versioning_seq.NEXTVAL
-                   , g_user
+        INSERT INTO tools.meta_code_versioning(schema
+                                             , object
+                                             , name
+                                             , filename
+                                             , script
+                                             , created_at)
+             VALUES (g_user
                    , 'VIEW'
                    , g_tab_views(i).view_name
                    , g_tab_views(i).filename
@@ -1471,15 +1445,13 @@ IS
 
     v_install_batch_template := lp_get_template(p_object => 'INSTALL_BAT');
 
-    INSERT INTO maint_waas.meta_code_versioning(id
-                                              , schema
-                                              , object
-                                              , name
-                                              , filename
-                                              , script
-                                              , created_at)
-         VALUES (maint_waas.meta_code_versioning_seq.NEXTVAL
-               , g_user
+    INSERT INTO tools.meta_code_versioning(schema
+                                         , object
+                                         , name
+                                         , filename
+                                         , script
+                                         , created_at)
+         VALUES (g_user
                , 'INSTALL_BAT'
                , v_filename
                , v_filename
@@ -1635,7 +1607,7 @@ IS
       FOR i IN (  SELECT filename
                        , name
                        , object
-                    FROM maint_waas.meta_code_versioning
+                    FROM tools.meta_code_versioning
                    WHERE object = scripts.object_type
                      AND schema = g_user
                 ORDER BY 1)
@@ -1694,13 +1666,9 @@ IS
                  AND object_type = 'PACKAGE'
                  AND status = 'VALID')
     LOOP
-      EXECUTE IMMEDIATE   'SELECT COUNT(*)
-                           FROM TABLE(maint_waas.om_tapigen.view_existing_apis(p_owner => '''
-                       || p_user
-                       || '''))
-                          WHERE owner = '''
-                       || p_user
-                       || ''''
+      EXECUTE IMMEDIATE 'SELECT COUNT(*)
+                           FROM TABLE(tools.om_tapigen.view_existing_apis(p_owner => ''' || p_user || '''))
+                          WHERE owner = ''' || p_user || ''''
         INTO v_table_api_counter;
 
       IF (v_table_api_counter > 0)
@@ -1733,15 +1701,13 @@ IS
     ----------------------------------------------------------------------------
     --  insert install sql file
     ----------------------------------------------------------------------------
-    INSERT INTO maint_waas.meta_code_versioning(id
-                                              , schema
-                                              , object
-                                              , name
-                                              , filename
-                                              , script
-                                              , created_at)
-         VALUES (maint_waas.meta_code_versioning_seq.NEXTVAL
-               , g_user
+    INSERT INTO tools.meta_code_versioning(schema
+                                         , object
+                                         , name
+                                         , filename
+                                         , script
+                                         , created_at)
+         VALUES (g_user
                , 'INSTALL_SQL'
                , v_filename
                , v_filename
@@ -1805,15 +1771,13 @@ IS
       -- bulk insert all scripts from collection
       --------------------------------------------------------------------------
       FORALL i IN INDICES OF g_tab_procedures
-        INSERT INTO maint_waas.meta_code_versioning(id
-                                                  , schema
-                                                  , object
-                                                  , name
-                                                  , filename
-                                                  , script
-                                                  , created_at)
-             VALUES (maint_waas.meta_code_versioning_seq.NEXTVAL
-                   , g_user
+        INSERT INTO tools.meta_code_versioning(schema
+                                             , object
+                                             , name
+                                             , filename
+                                             , script
+                                             , created_at)
+             VALUES (g_user
                    , 'PROCEDURE'
                    , g_tab_procedures(i).procedure_name
                    , g_tab_procedures(i).filename
@@ -1878,15 +1842,13 @@ IS
       -- bulk insert all scripts from collection
       --------------------------------------------------------------------------
       FORALL i IN INDICES OF g_tab_functions
-        INSERT INTO maint_waas.meta_code_versioning(id
-                                                  , schema
-                                                  , object
-                                                  , name
-                                                  , filename
-                                                  , script
-                                                  , created_at)
-             VALUES (maint_waas.meta_code_versioning_seq.NEXTVAL
-                   , g_user
+        INSERT INTO tools.meta_code_versioning(schema
+                                             , object
+                                             , name
+                                             , filename
+                                             , script
+                                             , created_at)
+             VALUES (g_user
                    , 'FUNCTION'
                    , g_tab_functions(i).function_name
                    , g_tab_functions(i).filename
@@ -1967,15 +1929,13 @@ IS
       -- bulk insert all scripts from collection
       --------------------------------------------------------------------------
       FORALL i IN INDICES OF g_tab_grants_from
-        INSERT INTO maint_waas.meta_code_versioning(id
-                                                  , schema
-                                                  , object
-                                                  , name
-                                                  , filename
-                                                  , script
-                                                  , created_at)
-             VALUES (maint_waas.meta_code_versioning_seq.NEXTVAL
-                   , g_user
+        INSERT INTO tools.meta_code_versioning(schema
+                                             , object
+                                             , name
+                                             , filename
+                                             , script
+                                             , created_at)
+             VALUES (g_user
                    , 'GRANT_FROM'
                    , g_tab_grants_from(i).name
                    , g_tab_grants_from(i).filename
@@ -2051,15 +2011,13 @@ IS
       -- bulk insert all scripts from collection
       --------------------------------------------------------------------------
       FORALL i IN INDICES OF g_tab_grants_to
-        INSERT INTO maint_waas.meta_code_versioning(id
-                                                  , schema
-                                                  , object
-                                                  , name
-                                                  , filename
-                                                  , script
-                                                  , created_at)
-             VALUES (maint_waas.meta_code_versioning_seq.NEXTVAL
-                   , g_user
+        INSERT INTO tools.meta_code_versioning(schema
+                                             , object
+                                             , name
+                                             , filename
+                                             , script
+                                             , created_at)
+             VALUES (g_user
                    , 'GRANT_TO'
                    , g_tab_grants_to(i).name
                    , g_tab_grants_to(i).filename
@@ -2137,15 +2095,13 @@ IS
       -- bulk insert all scripts from collection
       --------------------------------------------------------------------------
       FORALL i IN INDICES OF g_tab_mviews
-        INSERT INTO maint_waas.meta_code_versioning(id
-                                                  , schema
-                                                  , object
-                                                  , name
-                                                  , filename
-                                                  , script
-                                                  , created_at)
-             VALUES (maint_waas.meta_code_versioning_seq.NEXTVAL
-                   , g_user
+        INSERT INTO tools.meta_code_versioning(schema
+                                             , object
+                                             , name
+                                             , filename
+                                             , script
+                                             , created_at)
+             VALUES (g_user
                    , 'MATERIALIZED_VIEW'
                    , g_tab_mviews(i).mview_name
                    , g_tab_mviews(i).filename
@@ -2224,15 +2180,13 @@ IS
       -- bulk insert all scripts from collection
       --------------------------------------------------------------------------
       FORALL i IN INDICES OF g_tab_dblinks
-        INSERT INTO maint_waas.meta_code_versioning(id
-                                                  , schema
-                                                  , object
-                                                  , name
-                                                  , filename
-                                                  , script
-                                                  , created_at)
-             VALUES (maint_waas.meta_code_versioning_seq.NEXTVAL
-                   , g_user
+        INSERT INTO tools.meta_code_versioning(schema
+                                             , object
+                                             , name
+                                             , filename
+                                             , script
+                                             , created_at)
+             VALUES (g_user
                    , 'DATABASE_LINK'
                    , g_tab_dblinks(i).db_link
                    , g_tab_dblinks(i).filename
@@ -2275,7 +2229,7 @@ IS
     v_plsql_block :=
       '
         BEGIN
-          maint_waas.code_versioning_bl.ep_create_all(p_user                     => ''###p_user###''
+          tools.code_versioning_bl.ep_create_all(p_user                     => ''###p_user###''
 		                                                , p_create_sequences_yn      => ''###p_create_sequences_yn###''
                                                     , p_create_tables_yn         => ''###p_create_tables_yn###''
                                                     , p_create_indexes_yn        => ''###p_create_indexes_yn###''
@@ -2357,7 +2311,7 @@ IS
     ----------------------------------------------------------------------------
     -- delete existing scripts from user
     ----------------------------------------------------------------------------
-    DELETE FROM maint_waas.meta_code_versioning
+    DELETE FROM tools.meta_code_versioning
           WHERE schema = g_user;
 
     COMMIT;
