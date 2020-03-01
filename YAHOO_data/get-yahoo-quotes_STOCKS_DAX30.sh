@@ -4,8 +4,8 @@
 . get-yahoo-quotes.sh BAYN.DE ./STOCKS_DAX30/BAYN.DE.csv
 . get-yahoo-quotes.sh BEI.DE ./STOCKS_DAX30/BEI.DE.csv
 . get-yahoo-quotes.sh BMW.DE ./STOCKS_DAX30/BMW.DE.csv
-. get-yahoo-quotes.sh CON.DE ./STOCKS_DAX30/CON.DE.csv
-. get-yahoo-quotes.sh 1COV.DE ./STOCKS_DAX30/COV.DE.csv
+# . get-yahoo-quotes.sh CON.DE ./STOCKS_DAX30/CON.DE.csv
+. get-yahoo-quotes.sh 1COV.DE ./STOCKS_DAX30/1COV.DE.csv
 . get-yahoo-quotes.sh DAI.DE ./STOCKS_DAX30/DAI.DE.csv
 . get-yahoo-quotes.sh DBK.DE ./STOCKS_DAX30/DBK.DE.csv
 . get-yahoo-quotes.sh DB1.DE ./STOCKS_DAX30/DB1.DE.csv
