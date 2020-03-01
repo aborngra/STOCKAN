@@ -1,5 +1,7 @@
 BEGIN
-  FOR i IN (SELECT * FROM user_tables)
+  FOR i IN (SELECT *
+              FROM user_tables
+             WHERE external = 'NO')
   LOOP
     tools.om_tapigen.compile_api(p_table_name                  => i.table_name
                                , p_owner                       => USER
