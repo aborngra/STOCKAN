@@ -26,9 +26,13 @@ IS
                         (
                            TYPE oracle_loader
                            DEFAULT DIRECTORY ' || i."DIRECTORY" || '
-                           ACCESS PARAMETERS(RECORDS DELIMITED BY ''\n''
-                           FIELDS TERMINATED BY '',''
-                         ) LOCATION(''' || i."FILE" || '''))';
+                           ACCESS PARAMETERS(
+                             RECORDS DELIMITED BY ''\n''
+                             SKIP 1
+                             FIELDS TERMINATED BY '',''
+                           ) 
+                           LOCATION(''' || i."FILE" || ''')
+                        )';
     END LOOP;
   END create_external_tables;
 END "EXTERNAL_TABLES_BL";

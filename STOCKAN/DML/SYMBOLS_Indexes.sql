@@ -9,7 +9,7 @@ BEGIN
                    , 'DE0008469008' AS isin
                    , 'INDEX_DAX30' AS "DIRECTORY"
                    , '^GDAXI.csv' AS "FILE"
-                   , 'GDAXI' AS ext_table_name
+                   , 'EXT_GDAXI' AS ext_table_name
                    , 'DE' AS country_code
                 FROM DUAL
               UNION ALL
@@ -18,7 +18,7 @@ BEGIN
                    , 'DE0008467416' AS isin
                    , 'INDEX_MDAX50' AS "DIRECTORY"
                    , '^MDAXI.csv' AS "FILE"
-                   , 'MDAXI' AS ext_table_name
+                   , 'EXT_MDAXI' AS ext_table_name
                    , 'DE' AS country_code
                 FROM DUAL) src
           ON (trg.symbol = src.symbol)
