@@ -13,7 +13,7 @@ IS
                -----------------------------------------------------------------
                WHERE user_tables.table_name IS NULL)
     LOOP
-      EXECUTE IMMEDIATE 'CREATE TABLE ' || i.ext_table_name || '
+      EXECUTE IMMEDIATE 'CREATE TABLE "' || i.ext_table_name || '"
                          (
                            date_       VARCHAR2(32 CHAR)
                          , open_       VARCHAR2(32 CHAR)
