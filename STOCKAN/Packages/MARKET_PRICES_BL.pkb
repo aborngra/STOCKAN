@@ -6,12 +6,12 @@ IS
     -- ref cursor is used to load data from different tables
     ----------------------------------------------------------------------------
     TYPE t_weak_ref_cur IS REF CURSOR;
-    v_weak_ref_cur         t_weak_ref_cur;
+    v_weak_ref_cur        t_weak_ref_cur;
 
     ----------------------------------------------------------------------------
     -- all these tables have same structure
     ----------------------------------------------------------------------------
-    TYPE t_marketprice_rec_type IS RECORD
+    TYPE t_marketprice_rec IS RECORD
     (
       date_       DATE
     , open_       NUMBER
@@ -21,12 +21,18 @@ IS
     , adj_close_  NUMBER
     , volume_     NUMBER
     );
-    TYPE t_marketprice_tab_type IS TABLE OF t_marketprice_rec_type;
-    v_marketprice_tab_type t_marketprice_tab_type;
+    TYPE t_marketprice_tab IS TABLE OF t_marketprice_rec;
+    v_marketprice_tab     t_marketprice_tab;
 
-    c_bulk_limit  CONSTANT PLS_INTEGER := 10000;
-    v_sql                  VARCHAR2(4000 CHAR);
+    c_bulk_limit CONSTANT PLS_INTEGER := 20000;
+    v_partition_name      all_tab_partitions.partition_name%TYPE;
+    v_sql                 VARCHAR2(4000 CHAR);
   BEGIN
+    ----------------------------------------------------------------------------
+    -- ensure right nls_numeric_characters
+    ----------------------------------------------------------------------------
+    EXECUTE IMMEDIATE 'ALTER SESSION SET nls_numeric_characters = ''.,''';
+
     FOR i IN (SELECT *
                 FROM symbols s INNER JOIN user_tables t ON s.ext_table_name = t.table_name
                -----------------------------------------------------------------
@@ -34,7 +40,7 @@ IS
                -----------------------------------------------------------------
                WHERE s.symbol = COALESCE(p_symbol, s.symbol))
     LOOP
-      v_sql := 'WITH last_import AS (SELECT COALESCE(MAX("DATE"), TO_DATE(''01.01.1900'', ''dd.mm.yyyy'')) AS max_date
+      v_sql            := 'WITH last_import AS (SELECT COALESCE(MAX("DATE"), TO_DATE(''01.01.1900'', ''dd.mm.yyyy'')) AS max_date
                                        FROM marketprices
                                       WHERE symbol_id = ' || i.id || ')
                 SELECT TO_DATE(date_, ''yyyy-mm-dd'') AS date_
@@ -50,16 +56,14 @@ IS
                    AND high_ <> ''null''
                    AND low_  <> ''null''';
 
-      DBMS_OUTPUT.put_line(v_sql);
-
       OPEN v_weak_ref_cur FOR v_sql;
 
       LOOP
-        FETCH v_weak_ref_cur BULK COLLECT INTO v_marketprice_tab_type LIMIT c_bulk_limit;
+        FETCH v_weak_ref_cur BULK COLLECT INTO v_marketprice_tab LIMIT c_bulk_limit;
 
-        EXIT WHEN v_marketprice_tab_type.COUNT = 0;
+        EXIT WHEN v_marketprice_tab.COUNT = 0;
 
-        FORALL idx IN INDICES OF v_marketprice_tab_type
+        FORALL idx IN INDICES OF v_marketprice_tab
           INSERT INTO marketprices(symbol_id
                                  , "DATE"
                                  , open
@@ -71,21 +75,35 @@ IS
                                  , creation_usr
                                  , creation_dt)
                VALUES (i.id
-                     , v_marketprice_tab_type(idx).date_
-                     , v_marketprice_tab_type(idx).open_
-                     , v_marketprice_tab_type(idx).high_
-                     , v_marketprice_tab_type(idx).low_
-                     , v_marketprice_tab_type(idx).close_
-                     , v_marketprice_tab_type(idx).adj_close_
-                     , v_marketprice_tab_type(idx).volume_
+                     , v_marketprice_tab(idx).date_
+                     , v_marketprice_tab(idx).open_
+                     , v_marketprice_tab(idx).high_
+                     , v_marketprice_tab(idx).low_
+                     , v_marketprice_tab(idx).close_
+                     , v_marketprice_tab(idx).adj_close_
+                     , v_marketprice_tab(idx).volume_
                      , SYS_CONTEXT('USERENV', 'OS_USER')
                      , SYSDATE);
-
-        ------------------------------------------------------------------------
-        -- commit each symbol_id
-        ------------------------------------------------------------------------
-        COMMIT;
       END LOOP;
+
+      --------------------------------------------------------------------------
+      -- commit each symbol_id
+      --------------------------------------------------------------------------
+      COMMIT;
+
+      --------------------------------------------------------------------------
+      -- maintain the symbol_id partition: rename and stats
+      --------------------------------------------------------------------------
+      v_partition_name := 'P_SYMBOL_ID_' || LPAD(i.id, 7, 0);
+
+      tools.partition_control_bl.list_partition_rename(p_table_owner          => USER
+                                                     , p_table_name           => 'MARKETPRICES'
+                                                     , p_partition_name_new   => v_partition_name
+                                                     , p_partition_high_value => i.id);
+
+      tools.partition_control_bl.list_partition_stats(p_table_owner    => USER
+                                                    , p_table_name     => 'MARKETPRICES'
+                                                    , p_partition_name => v_partition_name);
 
       CLOSE v_weak_ref_cur;
     END LOOP;
