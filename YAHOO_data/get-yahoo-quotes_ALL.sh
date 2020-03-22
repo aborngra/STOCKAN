@@ -1,3 +1,5 @@
+. get-yahoo-quotes_ETF.sh
+
 . get-yahoo-quotes_INDEX_DAX30.sh
 
 . get-yahoo-quotes_INDEX_MDAX50.sh
